@@ -15,7 +15,7 @@ if 'authenticated' not in st.session_state:
 if not st.session_state.authenticated:
     st.title("🔒 TRACK.ai Access Required")
     password = st.text_input("Enter Access Code", type="password")
-    if password == "track123":  # You can change this code
+    if password == "track123":
         st.session_state.authenticated = True
     else:
         st.stop()
@@ -120,14 +120,19 @@ if uploaded_file:
     df['Total Float'] = (df['LS'] - df['ES']).dt.days
     df['Is_Critical'] = df['Total Float'] == 0
 
+    # --- Sidebar Filters ---
+    st.sidebar.header("🔍 Filters")
+    critical_filter = st.sidebar.checkbox("Show only critical activities")
+    activity_names = sorted(df['Activity Name'].unique())
+    selected_activities = st.sidebar.multiselect("Select activities to show", activity_names, default=activity_names)
+
+    filtered_df = df[df['Activity Name'].isin(selected_activities)]
+    if critical_filter:
+        filtered_df = filtered_df[filtered_df['Is_Critical']]
+
     # --- Interactive Gantt Chart ---
     st.subheader("📈 Gantt Chart")
-    critical_only = st.checkbox("Show Critical Path Only", value=False)
-    chart_df = df.copy()
-    if critical_only:
-        chart_df = chart_df[chart_df['Is_Critical']]
-
-    gantt_data = chart_df.rename(columns={'Activity Name': 'Task', 'ES': 'Start', 'EF': 'Finish'})
+    gantt_data = filtered_df.rename(columns={'Activity Name': 'Task', 'ES': 'Start', 'EF': 'Finish'})
     fig = px.timeline(gantt_data, x_start="Start", x_end="Finish", y="Task", color="Is_Critical",
                       color_discrete_map={True: 'red', False: 'gray'})
     fig.update_yaxes(autorange="reversed")
