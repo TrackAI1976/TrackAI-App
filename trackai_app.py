@@ -27,8 +27,8 @@ uploaded_file = st.file_uploader("Upload your project Excel file:", type=["xlsx"
 
 if uploaded_file:
     # --- Load Sheets ---
-    project_start_df = pd.read_excel(uploaded_file, sheet_name='Sheet2', header=None)
-    project_start_date = pd.to_datetime(project_start_df.iloc[0, 1])
+    project_start_df = pd.read_excel(uploaded_file, sheet_name='Sheet2')
+    project_start_date = pd.to_datetime(project_start_df.columns[1])
 
     df = pd.read_excel(uploaded_file, sheet_name='Sheet1')
     df.columns = df.columns.str.strip()
@@ -37,7 +37,8 @@ if uploaded_file:
 
     # --- Helper Function ---
     def parse_pred_detail(detail):
-        match = re.match(r"([A-Za-z0-9]+)\s+(FS|SS|FF|SF)([+-]\d+d)?", detail.strip())
+        # Accept formats like "A1010 FS+2d", "A1010:FS+2d", and "A1010:FS2d"
+        match = re.match(r"([A-Za-z0-9]+)[:\s]+(FS|SS|FF|SF)([+-]?\d+d)?", detail.strip())
         if match:
             pred, rel_type, lag = match.groups()
             lag_days = int(lag[:-1]) if lag else 0
@@ -141,7 +142,7 @@ if uploaded_file:
     st.plotly_chart(fig, use_container_width=True)
 
     # --- Download Updated Schedule ---
-    st.subheader("📥 Download Updated Schedule")
+    st.subheader("👅 Download Updated Schedule")
 
     # Create the output DataFrame
     output = df[['Activity ID', 'Activity Name', 'Duration', 'ES', 'EF', 'LS', 'LF', 'Total Float', 'Is_Critical']]
