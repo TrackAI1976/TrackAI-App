@@ -36,7 +36,7 @@ if uploaded_file:
     df['Predecessor Details'] = df['Predecessor Details'].fillna("").astype(str)
 
     # --- Helper Function ---
-def parse_pred_detail(entry):
+    def parse_pred_detail(entry):
     """
     Parses Primavera-style predecessor strings like:
     A1010:FS3, A1020 SS-2, A1030:FF, etc.
@@ -55,7 +55,7 @@ def parse_pred_detail(entry):
         G.add_node(row['Activity ID'], duration=row['Duration'], name=row['Activity Name'])
     for _, row in df.iterrows():
         details = row['Predecessor Details']
-for entry in re.split(r'[,\n;]+', details):
+    for entry in re.split(r'[,\n;]+', details):
             pred_id, rel_type, lag = parse_pred_detail(entry)
             if pred_id:
                 G.add_edge(pred_id, row['Activity ID'], rel_type=rel_type, lag=lag)
