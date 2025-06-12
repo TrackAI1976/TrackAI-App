@@ -38,7 +38,7 @@ if uploaded_file:
     # --- Helper Function ---
     def parse_pred_detail(entry):
         entry = entry.strip()
-        match = re.match(r"^\s*([A-Za-z0-9]+)[:\s]*(FS|SS|FF|SF)(-?\d+)?\s*$", entry)
+        match = re.match(r"^\s*([A-Za-z0-9]+)[:\s]*(FS|SS|FF|SF)\s*(-?\d+)?\s*$", entry)
         if match:
             pred_id, rel_type, lag = match.groups()
             lag_days = int(lag) if lag else 0
@@ -51,7 +51,7 @@ if uploaded_file:
         G.add_node(row['Activity ID'], duration=row['Duration'], name=row['Activity Name'])
     for _, row in df.iterrows():
         details = row['Predecessor Details']
-        for entry in re.split(r'[,\n;]+', details):
+        for entry in re.split(r'[\n,;]+', details):
             pred_id, rel_type, lag = parse_pred_detail(entry)
             if pred_id:
                 G.add_edge(pred_id, row['Activity ID'], rel_type=rel_type, lag=lag)
@@ -144,16 +144,12 @@ if uploaded_file:
     # --- Download Updated Schedule ---
     st.subheader("💅 Download Updated Schedule")
 
-    # Create the output DataFrame
     output = df[['Activity ID', 'Activity Name', 'Duration', 'ES', 'EF', 'LS', 'LF', 'Total Float', 'Is_Critical']]
-
-    # Create in-memory Excel file
     excel_buffer = BytesIO()
     with pd.ExcelWriter(excel_buffer, engine='openpyxl') as writer:
         output.to_excel(writer, index=False, sheet_name='Schedule Output')
     excel_buffer.seek(0)
 
-    # Streamlit download button
     st.download_button(
         label="Download Excel Output",
         data=excel_buffer,
@@ -161,3 +157,4 @@ if uploaded_file:
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         key="download_excel_output"
     )
+    
