@@ -37,13 +37,13 @@ if uploaded_file:
 
     # --- Helper Function ---
     def parse_pred_detail(entry):
-    entry = entry.strip()
-    match = re.match(r"^\s*([A-Za-z0-9]+)[:\s]*(FS|SS|FF|SF)(-?\d+)?\s*$", entry)
-    if match:
-        pred_id, rel_type, lag = match.groups()
-        lag_days = int(lag) if lag else 0
-        return pred_id, rel_type, lag_days
-    return None, None, 0
+        entry = entry.strip()
+        match = re.match(r"^\s*([A-Za-z0-9]+)[:\s]*(FS|SS|FF|SF)(-?\d+)?\s*$", entry)
+        if match:
+            pred_id, rel_type, lag = match.groups()
+            lag_days = int(lag) if lag else 0
+            return pred_id, rel_type, lag_days
+        return None, None, 0
 
     # --- Build Graph ---
     G = nx.DiGraph()
@@ -51,7 +51,7 @@ if uploaded_file:
         G.add_node(row['Activity ID'], duration=row['Duration'], name=row['Activity Name'])
     for _, row in df.iterrows():
         details = row['Predecessor Details']
-    for entry in re.split(r'[,\n;]+', details):
+        for entry in re.split(r'[,\n;]+', details):
             pred_id, rel_type, lag = parse_pred_detail(entry)
             if pred_id:
                 G.add_edge(pred_id, row['Activity ID'], rel_type=rel_type, lag=lag)
@@ -142,7 +142,7 @@ if uploaded_file:
     st.plotly_chart(fig, use_container_width=True)
 
     # --- Download Updated Schedule ---
-    st.subheader("👅 Download Updated Schedule")
+    st.subheader("💅 Download Updated Schedule")
 
     # Create the output DataFrame
     output = df[['Activity ID', 'Activity Name', 'Duration', 'ES', 'EF', 'LS', 'LF', 'Total Float', 'Is_Critical']]
