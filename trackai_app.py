@@ -37,11 +37,11 @@ if uploaded_file:
 
     # --- Helper Function ---
     def parse_pred_detail(detail):
-        # Accept formats like "A1010 FS+2d", "A1010:FS+2d", and "A1010:FS2d"
-        match = re.match(r"([A-Za-z0-9]+)[:\s]+(FS|SS|FF|SF)([+-]?\d+d)?", detail.strip())
+        # Accept formats like "A1010:FS3", "A1010 SS-2", no d, no + required
+        match = re.match(r"^\s*([A-Za-z0-9]+)[:\s]*(FS|SS|FF|SF)([-]?\d+)?\s*$", detail.strip())
         if match:
             pred, rel_type, lag = match.groups()
-            lag_days = int(lag[:-1]) if lag else 0
+            lag_days = int(lag) if lag else 0
             return pred, rel_type, lag_days
         return None, None, 0
 
