@@ -36,14 +36,18 @@ if uploaded_file:
     df['Predecessor Details'] = df['Predecessor Details'].fillna("").astype(str)
 
     # --- Helper Function ---
-    def parse_pred_detail(detail):
-        # Accept formats like "A1010:FS3", "A1010 SS-2", no d, no + required
-        match = re.match(r"^\s*([A-Za-z0-9]+)[:\s]*(FS|SS|FF|SF)([-]?\d+)?\s*$", detail.strip())
-        if match:
-            pred, rel_type, lag = match.groups()
-            lag_days = int(lag) if lag else 0
-            return pred, rel_type, lag_days
-        return None, None, 0
+def parse_pred_detail(entry):
+    """
+    Parses Primavera-style predecessor strings like:
+    A1010:FS3, A1020 SS-2, A1030:FF, etc.
+    """
+    entry = entry.strip()
+    match = re.match(r"^\s*([A-Za-z0-9]+)[:\s]*(FS|SS|FF|SF)(-?\d+)?\s*$", entry)
+    if match:
+        pred_id, rel_type, lag = match.groups()
+        lag_days = int(lag) if lag else 0
+        return pred_id, rel_type, lag_days
+    return None, None, 0
 
     # --- Build Graph ---
     G = nx.DiGraph()
@@ -51,7 +55,7 @@ if uploaded_file:
         G.add_node(row['Activity ID'], duration=row['Duration'], name=row['Activity Name'])
     for _, row in df.iterrows():
         details = row['Predecessor Details']
-        for entry in details.split(','):
+for entry in re.split(r'[,\n;]+', details):
             pred_id, rel_type, lag = parse_pred_detail(entry)
             if pred_id:
                 G.add_edge(pred_id, row['Activity ID'], rel_type=rel_type, lag=lag)
