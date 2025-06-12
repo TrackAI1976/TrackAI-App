@@ -38,7 +38,7 @@ if uploaded_file:
     # --- Helper Function ---
     def parse_pred_detail(entry):
         entry = entry.strip()
-        match = re.match(r"^\s*([A-Za-z0-9]+)[:\s]*(FS|SS|FF|SF)\s*(-?\d+)?\s*$", entry)
+        match = re.match(r"^([A-Za-z0-9\-]+):?\s*(FS|SS|FF|SF)\s*(-?\d+)?$", entry)
         if match:
             pred_id, rel_type, lag = match.groups()
             lag_days = int(lag) if lag else 0
@@ -157,4 +157,3 @@ if uploaded_file:
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         key="download_excel_output"
     )
-    
