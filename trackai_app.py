@@ -37,10 +37,6 @@ if uploaded_file:
 
     # --- Helper Function ---
     def parse_pred_detail(entry):
-    """
-    Parses Primavera-style predecessor strings like:
-    A1010:FS3, A1020 SS-2, A1030:FF, etc.
-    """
     entry = entry.strip()
     match = re.match(r"^\s*([A-Za-z0-9]+)[:\s]*(FS|SS|FF|SF)(-?\d+)?\s*$", entry)
     if match:
